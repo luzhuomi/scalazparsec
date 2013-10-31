@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>scala.parsec</groupId>
+    <artifactId>scalazparsec_2.9.2</artifactId>
+    <packaging>jar</packaging>
+    <description>Scalaz Parsec</description>
+    <version>1.0-SNAPSHOT</version>
+    <name>ScalazParsec</name>
+    <organization>
+        <name>scala.parsec</name>
+    </organization>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+	<dependency>
+	  <groupId>org.scalaz</groupId>
+	  <artifactId>scalaz-core_2.9.2</artifactId>
+	  <version>7.0.3</version>
+	</dependency>
+	
+    </dependencies>
+
+
+    <!-- manually included -->
+    <repositories>
+        <repository>
+            <id>scala-tools.org</id>
+            <name>Scala-tools Maven2 Repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>scala-tools.org</id>
+            <name>Scala-tools Maven2 Repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <build>
+        <plugins>
+            <!-- Scala compiler plugin -->
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                          <args>
+                            <arg>-optimise</arg>
+                          </args>
+                           <includes>
+                            <include>**/*.scala</include>
+                          </includes>
+                        </configuration> 
+                    </execution>
+                </executions>
+            </plugin> 
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>2.3.1</version>
+              <configuration>
+                <excludes>
+                  <exclude>**/*.xml</exclude>
+                </excludes>
+                <archive>
+                  <manifest>
+                  </manifest>
+                </archive>
+              </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
+
+
+</project>
