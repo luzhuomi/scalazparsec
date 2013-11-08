@@ -10,7 +10,7 @@ Examples
 ===========
 Using the backtracking parsec
 
-{{{
+```
 
 import scalaz._
 import Scalaz._
@@ -70,10 +70,10 @@ object JsonParsec {
 	 ts <- everythingUntil ( _ === '"'))
       yield (ts.mkString)
 }
-}}}
+```
 
 Trying it out in sbt console
-{{{
+```
 $ sbt console
 
 scala> import com.github.luzhuomi.scalazparsec.example.JsonParsec._
@@ -84,7 +84,7 @@ import com.github.luzhuomi.scalazparsec.Parsec._
 
 scala> run(parseJSON)("{\"x\":1,\"y\":[2]}".toList)
 res2: Option[(com.github.luzhuomi.scalazparsec.Parsec.JSON, List[com.github.luzhuomi.scalazparsec.Parsec.Token])] = Some((JMap(List(NVP(x), NVP(y))),List()))
-}}}
+```
 
 
 Using the Non-backtracking Parsec for optimization
