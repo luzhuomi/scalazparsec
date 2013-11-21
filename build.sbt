@@ -4,7 +4,7 @@ name := "scalazparsec"
 
 organization := "com.github.luzhuomi"
 
-version := "0.1.0"
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.9.2"
 
@@ -44,9 +44,13 @@ excludedFiles in assembly := { (bases: Seq[File]) =>
 publishMavenStyle := true
 
 
-publishTo := {
+publishTo <<= (version) { version: String =>
   val nexus = "https://oss.sonatype.org/"
-  Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  if (version.trim.endsWith("SNAPSHOT")) {
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+   } else {
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  }
 }
 
 publishArtifact in Test := false
