@@ -13,7 +13,9 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += "Maven Repository" at "http://mvnrepository.com/artifact/"
 
+resolvers += "OSS Sonatype" at "https://oss.sonatype.org/content/repositories/snapshots"
+
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.4"
 
-libraryDependencies += "com.github.luzhuomi" %% "scalazparsec" % "0.1.0"
+libraryDependencies += "com.github.luzhuomi" %% "scalazparsec" % "0.1.0-SNAPSHOT"
 
