@@ -107,7 +107,7 @@ instance MonadPlus Parser where
   def manyOp[A](p:Parser[A]):Parser[List[A]] = {
     def walk(acc:List[A])(ts:List[Token])(r:Option[(A,List[Token])]):Option[(List[A],List[Token])] = 
       r match {
-	case None => Some((Nil,ts))
+	case None => Some((acc,ts))
 	case Some ((x,ts_)) => 
 	  val acc_ = (x::acc)
 	  walk(acc_)(ts_)(run(p)(ts_))

@@ -8,12 +8,12 @@ name := "scalazparsec"
 
 organization := "com.github.luzhuomi"
 
-version := "0.1.0-SNAPSHOT"
+version := "0.1.1"
 
 // scalaVersion := "2.9.2"
 
 
-resolvers += "Apache HBase" at "https://repository.apache.org/content/repositories/releases"
+resolvers += "Apache Repo" at "https://repository.apache.org/content/repositories/releases"
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 

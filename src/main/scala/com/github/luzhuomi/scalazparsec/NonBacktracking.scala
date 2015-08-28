@@ -97,6 +97,7 @@ object NonBacktracking
 	 case (c::cs) => Consumed((c,cs).some:Option[(Token,List[Token])])
        }
       })
+
   
   def sat(p:Token => Boolean) : Parser[Token] = 
     /*  this doesn't work because item has changed the status to consumed from empty. Even though mzero is executed, the bind op returns Consumed
@@ -143,7 +144,7 @@ object NonBacktracking
   def manyOp[A](p:Parser[A]):Parser[List[A]] = {
     def walk(acc:List[A])(ts:List[Token])(r:Result[Option[(A,List[Token])]]):Option[(List[A],List[Token])] = 
       r match {
-	case Empty(None) => Some((Nil,ts))
+	case Empty(None) => Some((acc,ts))
 	// case Empty(_)    => error("many is applied to an empty parser")
 	case Consumed(None) => None
 	case Consumed(Some ((x,ts_))) => 
