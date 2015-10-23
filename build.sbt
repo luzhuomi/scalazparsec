@@ -38,6 +38,8 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 publishMavenStyle := true
 
 
+// publishTo := Some(Resolver.file("mavenLocal",  new File(Path.userHome.absolutePath+"/git/mavenrepo/")))
+
 // publishTo <<= (version) { version: String =>
 //  val nexus = "https://oss.sonatype.org/"
 //  if (version.trim.endsWith("SNAPSHOT")) {
