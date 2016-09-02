@@ -4,7 +4,6 @@ package com.github.luzhuomi.scalazparsec
 import scalaz._
 import Scalaz._
 
-
 object CharParser // CharParser is a Nonbacktracking Parsec with parametrized state 'S'
 {
 
@@ -34,54 +33,10 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
   // implicit def allows type variables, implicit object does not. 
   // Lambda is to replace a partially applied type constructor Parser[S], B is extensitial?
   // 
-  /*
-
-  implicit def parserFunctor[S] = new Functor[({type Lambda[B] = Parser[S,B]})#Lambda] { 
-    override def map[A,B](p:Parser[S,A])(f:A => B):Parser[S,B] = {
-      Parser(st_toks =>
-        run(p)(st_toks) match 
-        {
-          case Consumed(mb) => {
-            lazy val cont = 
-              mb match {
-                case None => None 
-                case Some((a, st_toks_)) => Some((f(a),st_toks_))
-              }
-            Consumed(cont)
-          }
-          case Empty(mb) => mb match 
-          {
-            case None => Empty(None)
-            case Some((a, sttoks_)) => Empty(Some((f(a),sttoks_)))
-          }
-        }
-      )
-    }
-  }
-
-  implicit def parserBind[S] = new Bind[({type Lambda[B] = Parser[S,B]})#Lambda] {
-    // Bind bind
-    override def bind[A, B](p: Parser[S, A])(f: A => Parser[S, B]): Parser[S, B] =
-    Parser(st_toks =>
-      run(p)(st_toks) match {
-        case Consumed(mb) => {
-          lazy val cont = // this has to be lazy, otherwise we are going down the parse even if it is within an attempt(_) {
-            mb match {
-              case None => None
-              case Some((a, st_toks_)) => run(f(a))(st_toks_) match {
-                case Consumed(x) => x
-                case Empty(x) => x
-              }
-            }
-          Consumed(cont)
-        }
-        case Empty(mb) => mb match {
-          case None => Empty(None)
-          case Some((a, sttoks_)) => run((f(a)))(sttoks_)
-        }
-      })    
-  }
   
+  
+  // implicit def parserUnapply[S] = new Unapply[Bind, Parser[S,Token]]{ }
+
   implicit def parserMonadPlus[S] = new MonadPlus[({type Lambda[B] = Parser[S,B]})#Lambda] {
     // Applicative point
     override def point[A](a: => A): Parser[S, A] = // point is 'pure' from applicative, is the haskell 'return' from monad, scala cleans up the mess with applicative and monad
@@ -100,6 +55,26 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
         case consumed => consumed
       })
     }
+    override def bind[A, B](p: Parser[S, A])(f: A => Parser[S, B]): Parser[S, B] =
+    Parser(st_toks =>
+      run(p)(st_toks) match {
+        case Consumed(mb) => {
+          lazy val cont = // this has to be lazy, otherwise we are going down the parse even if it is within an attempt(_) {
+            mb match {
+              case None => None
+              case Some((a, st_toks_)) => run(f(a))(st_toks_) match {
+                case Consumed(x) => x
+                case Empty(x) => x
+              }
+            }
+          Consumed(cont)
+        }
+        case Empty(mb) => mb match {
+          case None => Empty(None)
+          case Some((a, sttoks_)) => run((f(a)))(sttoks_)
+        }
+      }
+    )
   } 
   
   // wrappers
@@ -211,29 +186,35 @@ r <- if (p(c)) point(c) else empty
     lazy val p2: Parser[S,\/[A, Unit]] = point(\/-(()))
     plus(attempt(p1), p2)
   }
-  */
- /* 
   
-  // everything until condition
   def everythingUntil[S](p: Token => Boolean): Parser[S,List[Token]] =
-    for (c <- item; // a bug here?
-         r <- if (!p(c)) {
-           for (cs <- everythingUntil(p)) yield (c :: cs)
-         }
-         else {
-           point(Nil)
-         }
+  {
+    for (c <- item[S]; // a bug here? 
+        /* require type arg to be explicit, otherwise implicit of Unapply[Bind,Parser[S,Token]] can't be resolved with the following error.
+        Kind inference error arising from below
+        Implicit not found: scalaz.Unapply[scalaz.Bind, com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]]. 
+        Unable to unapply type `com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]` 
+        into a type constructor of kind `M[_]` that is classified by the type class `scalaz.Bind`.
+        */ 
+        r <- if (!p(c)) 
+        {
+          for (cs <- everythingUntil[S](p)) yield (c :: cs)
+        }
+        else 
+        {
+          point[S,List[Token]](Nil)
+        }
     ) yield r
-
-
+  }
+    
   // get something without consuming the input
   def lookAhead[S,A](p: Parser[S,A]): (Parser[S,A]) =
-    for (st_toks <- getState;
+  {
+    for (st_toks <- getState[S];
          x <- p;
          _ <- setState(st_toks))
-      yield x
-  */
-  
+    yield x
+  }
 }
 
 
