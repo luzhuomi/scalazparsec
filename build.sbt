@@ -8,7 +8,7 @@ name := "scalazparsec"
 
 organization := "com.github.luzhuomi"
 
-version := "0.1.2"
+version := "0.1.3"
 
 scalaVersion := "2.11.8"
 
