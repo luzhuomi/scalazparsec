@@ -56,7 +56,7 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 		// Empty empty
 		override def empty[A]: Parser[S,A] = 
 		{ 
-			Parser(st_toks => Empty(Fail("Parsing failure issued by the empty combinator",st_toks)))
+			Parser(st_toks => Empty(Fail("[Error] Empty input token stream:\n",st_toks)))
 		}
 		// Plus plus
 		override def plus[A](p: Parser[S,A], q: => Parser[S,A]): Parser[S,A] =
@@ -72,6 +72,7 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 					{
 						Empty(Fail(err2,st2))
 					}
+					case consumed => consumed
 				}
 				case Empty(some) => run(q)(st_toks) match {
 					case Empty(_) => Empty(some) // if q fails we report the first errpor
@@ -123,7 +124,7 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 	def item[S]: Parser[S,Token] =
 		Parser(st_toks => {
 			st_toks match {
-				case (st,Nil)		 => Empty(Fail("Parser failed due to an empty input token stream.",(st,Nil)))
+				case (st,Nil)		 => Empty(Fail("[Error] Empty input token stream:\n ",(st,Nil)))
 				case (st,(c::cs)) => Consumed(Succ((c, (st,cs))))
 			}
 		})
@@ -138,9 +139,9 @@ r <- if (p(c)) point(c) else empty
 */
 		Parser(st_toks => {
 			st_toks match {
-				case (st,Nil) => Empty(Fail("Parser failed due to an empty input token stream.",(st,Nil)))
+				case (st,Nil) => Empty(Fail("[Error] Empty input token stream:\n ",(st,Nil)))
 				case (st,(c :: cs_)) if p(c) => Consumed(Succ((c, (st,cs_))))
-				case (st,(c :: cs_)) => Empty(Fail("Parser failed at the following token $c.",(st,c::cs_))) // otherwise
+				case (st,(c :: cs_)) => Empty(Fail(s"[Error] Unexpected token $c:\n ",(st,c::cs_))) // otherwise
 			}
 		})
 

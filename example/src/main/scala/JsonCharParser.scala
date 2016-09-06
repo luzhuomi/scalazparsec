@@ -136,6 +136,15 @@ object JsonCharParser {
 	"y":[2]}
 	"""
 
+	def parse(s:String):Unit = {
+		run(parseJSON)(initState,s.toList) match 
+		{
+			case Consumed(Fail(err,(State(ln),toks))) => println(err + s"at line $ln with '" + toks.take(20).mkString+ "'")
+			case Empty(Fail(err,(State(ln),toks))) => println(err + s"at line $ln with '" + toks.take(20).mkString + "'")
+			case otherwise => println(otherwise)
+		}
+	}
+
 }
 
 /*
