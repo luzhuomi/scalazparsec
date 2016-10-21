@@ -10,7 +10,7 @@ Examples
 ===========
 Using the backtracking parsec
 
-```
+```scala
 
 import scalaz._
 import Scalaz._
@@ -73,7 +73,7 @@ object JsonParsec {
 ```
 
 Trying it out in sbt console
-```
+```scala
 $ sbt console
 
 scala> import com.github.luzhuomi.scalazparsec.example.JsonParsec._
