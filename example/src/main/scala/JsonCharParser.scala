@@ -33,6 +33,7 @@ object JsonCharParser {
 		case (State(l),tks) => (State(l+1),tks)
 	}
 
+
 	def isWhiteSpace(c:Char):Boolean = c match
 	{
 		case ' ' => true
@@ -42,23 +43,43 @@ object JsonCharParser {
 		case _ => false
 	}
 
-	def sat(p: Token => Boolean): Parser[State,Token] = psat[State](p)
-	def everythingUntil(p: Token => Boolean): Parser[State,List[Token]] = peverythingUntil[State](p)
+	def sat(p: Token => Boolean): Parser[State,Token] = for 
+	{
+		c <- psat[State](p)
+		_ <- incrLineIfRet(c)
+	} yield c
+
+	type L[X] = Parser[State,X]
+	def everythingUntil(p: Token => Boolean): Parser[State,List[Token]] = for 
+	{
+		cs <- peverythingUntil[State](p)
+		_  <- cs.map( (c:Token) => incrLineIfRet(c)).sequence[L,Unit] //[({type l[A]=Parser[State,A]})#l,Unit]
+	} yield cs
 	def lookAhead[A](p: Parser[State,A]): (Parser[State,A]) = plookAhead[State,A](p)
 	def getState: Parser[State,(State,List[Token])] = pgetState
 	def setState(st_toks: (State,List[Token])): Parser[State,Unit] = psetState(st_toks)
 	def point[A](x:A):Parser[State,A] = ppoint(x)
+
+	def incrLineIfRet(c:Token) : Parser[State,Unit] = 
+	{
+		if ((c == '\n') || (c == '\r'))
+		{	
+			for 
+			{ 
+				st <- getState
+				_  <- setState(incrLine(st))
+			} yield ()
+		} 
+		else 
+		{
+			point(())
+		}
+	} 
+
 	def whiteSpace:Parser[State,Char] = for 
 	{
 		c <- sat(x => isWhiteSpace(x))
-		st <- getState
-		_ <- if ((c == '\n') || (c == '\r'))
-			{  
-				setState(incrLine(st))
-			} else 
-			{
-			 	point(())
-			}		
+		_ <- incrLineIfRet(c)
 	} yield c
 	
 

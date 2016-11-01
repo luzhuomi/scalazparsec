@@ -8,9 +8,11 @@ name := "scalazparsec"
 
 organization := "com.github.luzhuomi"
 
-version := "0.1.3"
+version := "0.1.4"
 
 scalaVersion := "2.11.8"
+
+crossScalaVersions := Seq("2.10.6", "2.11.8")
 
 
 resolvers += "Apache Repo" at "https://repository.apache.org/content/repositories/releases"

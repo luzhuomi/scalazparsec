@@ -176,7 +176,7 @@ r <- if (p(c)) point(c) else empty
 		def walk(acc: List[A])(ts: (S,List[Token]))(r: Result[ParseResult[S,(A, (S,List[Token]))]]): ParseResult[S,(List[A], (S,List[Token]))] =
 			r match {
 				case Empty(Fail(_,_)) => Succ((acc, ts))
-				// case Empty(_)		=> error("many is applied to an empty parser")
+				case Empty(_)		=> error("many is applied to a parser which accepts empty input")
 				case Consumed(Fail(err,st)) => Fail(err,st)
 				case Consumed(Succ((x, ts_))) =>
 					val acc_ = (x :: acc)
@@ -185,7 +185,7 @@ r <- if (p(c)) point(c) else empty
 		Parser(st_toks =>
 			run(p)(st_toks) match {
 				case Empty(Fail(_,_)) => Empty(Succ((Nil,st_toks)))
-				// case Empty(_)		=> error("many is applied to an empty parser")
+				case Empty(_)		=> error("many is applied to a parser which accepts empty input")
 				case Consumed(x) => Consumed(walk(Nil)(st_toks)(Consumed(x)))
 			})
 	}
