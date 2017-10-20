@@ -21,11 +21,11 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 
 	sealed trait ParseResult[S,+A] // todo: need to find out why this has to be co-variant
 	case class Succ[S,A](x:A) extends ParseResult[S,A]
-	case class Fail[S,A](err:String, st:(S,List[Token])) extends ParseResult[S,A]	
+	case class Fail[S,A](err:String, st:(S,List[Token])) extends ParseResult[S,A]
 
 
 	// compare STs
-	def consumedMore[S](st1:(S,List[Token]),st2:(S,List[Token])):Boolean = (st1,st2) match 
+	def consumedMore[S](st1:(S,List[Token]),st2:(S,List[Token])):Boolean = (st1,st2) match
 	{
 		case ((_,tokens1), (_,tokens2)) => tokens1.length <= tokens2.length
 	}
@@ -42,11 +42,11 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 	}
 
 	// Scala instances are declared in a lexically scoped, named and implicit object/def
-	// implicit def allows type variables, implicit object does not. 
+	// implicit def allows type variables, implicit object does not.
 	// Lambda is to replace a partially applied type constructor Parser[S], B is extensitial?
-	// 
-	
-	
+	//
+
+
 	// implicit def parserUnapply[S] = new Unapply[Bind, Parser[S,Token]]{ }
 
 	implicit def parserMonadPlus[S] = new MonadPlus[({type Lambda[B] = Parser[S,B]})#Lambda] {
@@ -54,17 +54,17 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 		override def point[A](a: => A): Parser[S, A] = // point is 'pure' from applicative, is the haskell 'return' from monad, scala cleans up the mess with applicative and monad
 			Parser(st_toks => Empty(Succ((a, st_toks))))
 		// Empty empty
-		override def empty[A]: Parser[S,A] = 
-		{ 
+		override def empty[A]: Parser[S,A] =
+		{
 			Parser(st_toks => Empty(Fail("[Error] Empty input token stream:\n",st_toks)))
 		}
 		// Plus plus
 		override def plus[A](p: Parser[S,A], q: => Parser[S,A]): Parser[S,A] =
 		{
-			Parser(st_toks => run(p)(st_toks) match 
+			Parser(st_toks => run(p)(st_toks) match
 			{
 				case Empty(Fail(err1,st1)) => run(q)(st_toks) match // only back track when it is empty
-				{ 
+				{
 					case Empty(Fail(err2,st2)) => if (consumedMore(st1,st2))
 					{
 						Empty(Fail(err1,st1))
@@ -103,8 +103,8 @@ object CharParser // CharParser is a Nonbacktracking Parsec with parametrized st
 				}
 			)
 		}
-	} 
-	
+	}
+
 	// wrappers
 	def plus[S,A](p: Parser[S,A], q: => Parser[S,A])(implicit m: MonadPlus[({type Lambda[B] = Parser[S,B]})#Lambda]): Parser[S,A] = m.plus(p, q)
 
@@ -176,7 +176,7 @@ r <- if (p(c)) point(c) else empty
 		def walk(acc: List[A])(ts: (S,List[Token]))(r: Result[ParseResult[S,(A, (S,List[Token]))]]): ParseResult[S,(List[A], (S,List[Token]))] =
 			r match {
 				case Empty(Fail(_,_)) => Succ((acc, ts))
-				case Empty(_)		=> error("many is applied to a parser which accepts empty input")
+				case Empty(_)		=> scala.sys.error("many is applied to a parser which accepts empty input")
 				case Consumed(Fail(err,st)) => Fail(err,st)
 				case Consumed(Succ((x, ts_))) =>
 					val acc_ = (x :: acc)
@@ -185,20 +185,20 @@ r <- if (p(c)) point(c) else empty
 		Parser(st_toks =>
 			run(p)(st_toks) match {
 				case Empty(Fail(_,_)) => Empty(Succ((Nil,st_toks)))
-				case Empty(_)		=> error("many is applied to a parser which accepts empty input")
+				case Empty(_)		=> scala.sys.error("many is applied to a parser which accepts empty input")
 				case Consumed(x) => Consumed(walk(Nil)(st_toks)(Consumed(x)))
 			})
 	}
 
 	// interleave As with B as delimeter
 	def interleave[S, A, B](pa: Parser[S,A])(pb: Parser[S,B]): Parser[S,List[A]] = {
-		lazy val p1 = for 
+		lazy val p1 = for
 		{
 			a <- pa
 			b <- pb
 			as <- interleave(pa)(pb)
 		} yield (a :: as)
-		lazy val p2 = for 
+		lazy val p2 = for
 		{
 			a <- pa
 		} yield List(a)
@@ -218,27 +218,27 @@ r <- if (p(c)) point(c) else empty
 		lazy val p2: Parser[S,\/[A, Unit]] = point(\/-(()))
 		plus(attempt(p1), p2)
 	}
-	
+
 	def everythingUntil[S](p: Token => Boolean): Parser[S,List[Token]] =
 	{
-		for (c <- item[S]; // a bug here? 
+		for (c <- item[S]; // a bug here?
 				/* require type arg to be explicit, otherwise implicit of Unapply[Bind,Parser[S,Token]] can't be resolved with the following error.
 				Kind inference error arising from below
-				Implicit not found: scalaz.Unapply[scalaz.Bind, com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]]. 
-				Unable to unapply type `com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]` 
+				Implicit not found: scalaz.Unapply[scalaz.Bind, com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]].
+				Unable to unapply type `com.github.luzhuomi.scalazparsec.CharParser.Parser[S,com.github.luzhuomi.scalazparsec.CharParser.Token]`
 				into a type constructor of kind `M[_]` that is classified by the type class `scalaz.Bind`.
-				*/ 
-				r <- if (!p(c)) 
+				*/
+				r <- if (!p(c))
 				{
 					for (cs <- everythingUntil[S](p)) yield (c :: cs)
 				}
-				else 
+				else
 				{
 					point[S,List[Token]](Nil)
 				}
 		) yield r
 	}
-		
+
 	// get something without consuming the input
 	def lookAhead[S,A](p: Parser[S,A]): (Parser[S,A]) =
 	{
@@ -248,5 +248,3 @@ r <- if (p(c)) point(c) else empty
 		yield x
 	}
 }
-
-

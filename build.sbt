@@ -12,7 +12,7 @@ version := "0.1.4"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.10.6", "2.11.8")
+crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.3")
 
 
 resolvers += "Apache Repo" at "https://repository.apache.org/content/repositories/releases"
@@ -21,7 +21,7 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += "Maven Repository" at "http://mvnrepository.com/artifact/"
 
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.4"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.12"
 
 
 // seq(assemblySettings: _*)
